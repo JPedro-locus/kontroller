@@ -1,15 +1,23 @@
 // src/App.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, CssBaseline, Toolbar } from '@mui/material';
-import Sidebar from './components/Sidebar';
+import Sidebar from './components/Sidebar/Sidebar';
+import Dashboard from './pages/Dashborad';
 
 function App() {
+  // define qual item do menu está ativo
+  const [selected, setSelected] = useState('Dashboard');
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
 
       {/* Menu lateral */}
-      <Sidebar />
+      <Sidebar
+      
+        selectedItem={selected}
+        onSelect={(item) => setSelected(item)}
+      />
 
       {/* Conteúdo principal */}
       <Box
@@ -19,11 +27,17 @@ function App() {
           p: 3,
         }}
       >
-        {/* Esse Toolbar “empurra” o seu conteúdo abaixo da AppBar (se você tiver) */}
+        {/* Espaço para AppBar (se você tiver uma) */}
         <Toolbar />
 
-        <h1>Bem-vindo ao seu dashboard</h1>
-        {/* demais componentes / rotas */}
+        {/* Aqui você renderiza o Dashboard ou outra “page” conforme o selected */}
+        {selected === 'Dashboard' && <Dashboard />}
+
+        {/* Exemplo de placeholders para futuras telas:
+            {selected === 'DRE'        && <DREPage />}
+            {selected === 'Simulação' && <SimulacaoPage />}
+            etc.
+        */}
       </Box>
     </Box>
   );
