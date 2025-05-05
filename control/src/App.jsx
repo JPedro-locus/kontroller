@@ -1,43 +1,37 @@
 // src/App.jsx
 import React, { useState } from 'react';
 import { Box, CssBaseline, Toolbar } from '@mui/material';
+import Header from './components/Header/Header';
 import Sidebar from './components/Sidebar/Sidebar';
 import Dashboard from './pages/Dashborad';
 
 function App() {
-  // define qual item do menu está ativo
   const [selected, setSelected] = useState('Dashboard');
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <CssBaseline />
 
-      {/* Menu lateral */}
-      <Sidebar
-      
-        selectedItem={selected}
-        onSelect={(item) => setSelected(item)}
-      />
+      {/* Header no topo */}
+      <Header />
 
-      {/* Conteúdo principal */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-        }}
-      >
-        {/* Espaço para AppBar (se você tiver uma) */}
-        <Toolbar />
+      {/* Corpo: sidebar + conteúdo */}
+      <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
+        <Sidebar
+          selectedItem={selected}
+          onSelect={(item) => setSelected(item)}
+        />
 
-        {/* Aqui você renderiza o Dashboard ou outra “page” conforme o selected */}
-        {selected === 'Dashboard' && <Dashboard />}
+        <Box
+          component="main"
+          sx={{ flexGrow: 1, p: 3, overflowY: 'auto' }}
+        >
+          {/* Espaço para alinhar com o Toolbar interno, se precisar */}
+          <Toolbar />
 
-        {/* Exemplo de placeholders para futuras telas:
-            {selected === 'DRE'        && <DREPage />}
-            {selected === 'Simulação' && <SimulacaoPage />}
-            etc.
-        */}
+          {selected === 'Dashboard' && <Dashboard />}
+          {/* futuramente: selected === 'DRE' && <DREPage /> etc. */}
+        </Box>
       </Box>
     </Box>
   );
