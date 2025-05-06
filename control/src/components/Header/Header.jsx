@@ -12,7 +12,8 @@ const Search = styled('div')(({ theme }) => ({
   backgroundColor: '#f0f0f0',
   borderRadius: theme.shape.borderRadius,
   width: '100%',
-  maxWidth: 500,
+  height: "100%",
+  maxWidth: 1100,
   display: 'flex',
   alignItems: 'center',
   padding: theme.spacing(0.5, 1),
@@ -39,11 +40,11 @@ export default function Header() {
           component="img"
           src={logoImg}
           alt="Kontrolle"
-          sx={{ height: 32, mr: 2 }}
+          sx={{ height: 40, mr: 2 }}
         />
 
         {/* Campo de busca */}
-        <Search style={{borderRadius:20, marginLeft:100, backgroundColor: "#ECE6F0"}}>
+        <Search style={{borderRadius:40, marginLeft:150, backgroundColor: "#ECE6F0", height: 50}}>
           <SearchIcon sx={{ color: 'text.secondary' }} />
           <SearchInput
             placeholder="Pesquisar"
@@ -64,7 +65,7 @@ export default function Header() {
           <SettingsOutlinedIcon />
         </IconButton>
         <IconButton aria-label="perfil">
-          <Avatar sx={{ width: 32, height: 32 }}>U</Avatar>
+          <Avatar sx={{ width: 40, height: 40 }}>U</Avatar>
         </IconButton>
       </Toolbar>
     </AppBar>
