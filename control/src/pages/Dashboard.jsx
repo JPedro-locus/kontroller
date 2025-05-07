@@ -209,7 +209,7 @@ export default function Dashboard() {
             series={barSeries}
             options={{
               ...barOptions,
-              chart: { ...barOptions.chart, height: 240 },
+              chart: { ...barOptions.chart},
             }}
             legend={[
               { label: 'Orçado', color: '#000000' },
@@ -218,6 +218,7 @@ export default function Dashboard() {
             updatedAt="Atualizado 9 de maio"
             favorite={favorites.bar}
             onToggleFavorite={() => toggle('bar')}
+            chartWidth="200%"
           />
         </Grid>
         <Grid item xs={12} md={3}>
@@ -226,7 +227,7 @@ export default function Dashboard() {
             series={radialFullSeries}
             options={{
               ...radialFullOptions,
-              chart: { ...radialFullOptions.chart, height: 200 },
+              chart: { ...radialFullOptions.chart },
             }}
             legend={[
               { label: 'Lorem ipsum', color: '#000000' },
@@ -236,6 +237,7 @@ export default function Dashboard() {
             updatedAt="Atualizado 9 de maio"
             favorite={favorites.full}
             onToggleFavorite={() => toggle('full')}
+            chartWidth='120%'
           />
         </Grid>
         <Grid item xs={12} md={3}>
@@ -250,6 +252,7 @@ export default function Dashboard() {
             updatedAt="Atualizado 9 de maio"
             favorite={favorites.semi}
             onToggleFavorite={() => toggle('semi')}
+            chartWidth='200%'
           />
         </Grid>
       </Grid>

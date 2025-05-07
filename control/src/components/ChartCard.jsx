@@ -17,22 +17,24 @@ export default function ChartCard({
   title,
   series,
   options,
-  legend,        // opcional: [{ label, color }, ...]
+  legend,            // opcional: [{ label, color }, ...]
   updatedAt,
   favorite,
-  onToggleFavorite
+  onToggleFavorite,
+  chartHeight = 300, // altura padrão
+  chartWidth  = '100%' // largura padrão
 }) {
   return (
-    <Card sx={{ borderRadius: 2, bgcolor: '#f5f5f5' }}>
+    <Card sx={{ width: '100%', borderRadius: 2, bgcolor: '#f5f5f5' }}>
       <CardContent>
         {/* Cabeçalho */}
         <Box display="flex" alignItems="center">
           <Typography variant="body2" fontWeight={500}>
             {title}
           </Typography>
-          <InfoOutlinedIcon 
-            fontSize="small" 
-            sx={{ mx: 0.5, color: 'text.secondary' }} 
+          <InfoOutlinedIcon
+            fontSize="small"
+            sx={{ mx: 0.5, color: 'text.secondary' }}
           />
           <Box flexGrow={1} />
           <IconButton size="small">
@@ -41,12 +43,13 @@ export default function ChartCard({
         </Box>
 
         {/* Gráfico */}
-        <Box sx={{ my: 2 }}>
+        <Box sx={{ my: 2, width: '100%' }}>
           <Chart
             options={options}
             series={series}
             type={options.chart.type}
-            height={options.chart.height || 200}
+            height={chartHeight}
+            width={chartWidth}
           />
         </Box>
 
@@ -79,10 +82,7 @@ export default function ChartCard({
 
         {/* Rodapé */}
         <Box display="flex" alignItems="center">
-          <Typography
-            variant="caption"
-            color="text.secondary"
-          >
+          <Typography variant="caption" color="text.secondary">
             {updatedAt}
           </Typography>
           <Box flexGrow={1} />
@@ -91,7 +91,7 @@ export default function ChartCard({
             onClick={onToggleFavorite}
             sx={{ ml: 0.5 }}
           >
-            {favorite 
+            {favorite
               ? <StarIcon fontSize="small" color="primary" />
               : <StarBorderIcon fontSize="small" />
             }
