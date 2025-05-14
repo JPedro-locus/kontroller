@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import DRE from './pages/DRE';
 import KPIs from './pages/KPIs'; // <- importe aqui
 import Login from './pages/Login';
+import CreateKPI from './pages/CreateKPI';
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -25,6 +26,9 @@ export default function App() {
     setLoggedIn(true);
     setSelected('Dashboard'); 
   };
+
+  const handleCreateKPI = () => setSelected('CreateKPI');
+  const handleBackFromCreate = () => setSelected('KPIs');
 
   if (!loggedIn) {
     return <Login onLogin={handleLogin} />;
@@ -59,7 +63,8 @@ export default function App() {
 
           {selected === 'Dashboard' && <Dashboard key={reloadKey} />}
           {selected === 'DRE'       && <DRE />}
-          {selected === 'KPIs'      && <KPIs />}  {/* <- adicionada a rota de KPIs */}
+          {selected === 'KPIs'       && <KPIs onCreate={handleCreateKPI} />}
+          {selected === 'CreateKPI'  && <CreateKPI onBack={handleBackFromCreate} />}
           {/* adicione aqui outras páginas conforme precisar */}
           
         </Box>

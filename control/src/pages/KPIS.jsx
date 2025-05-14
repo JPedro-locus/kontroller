@@ -26,7 +26,7 @@ import { Add as AddIcon, Download as DownloadIcon } from '@mui/icons-material';
 import Header from '../components/Header/Header';
 import Sidebar from '../components/Sidebar/Sidebar';
 
-export default function KPIs() {
+export default function KPIs({ onCreate }) {
   // filtros de topo
   const [historia, setHistoria] = useState('Histórico');
   const [period, setPeriod]     = useState('');
@@ -46,13 +46,12 @@ export default function KPIs() {
   ];
 
   return (
-    <Box sx={{ display:'flex', height:'100vh', width:'100vw' }}>
+    <Box sx={{ display:'flex', height:'98vh', width:'98vw' }}>
       <Sidebar selectedItem="KPIs" onSelect={() => {}} />
 
       <Box sx={{ flexGrow:1, overflow:'auto' }}>
-        <Header />
 
-        <Container maxWidth={false} disableGutters sx={{ p:3 }}>
+        <Container maxWidth={false} disableGutters>
           {/* título + histórico toggle */}
           <Box display="flex" alignItems="center" mb={2}>
             <Typography variant="h4" sx={{ mr:2 }}>KPIs</Typography>
@@ -136,6 +135,7 @@ export default function KPIs() {
               startIcon={<AddIcon />}
               variant="outlined"
               size="small"
+              onClick={onCreate}                // ← aqui
             >
               Criar KPI
             </Button>
