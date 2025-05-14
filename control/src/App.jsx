@@ -5,9 +5,12 @@ import Header from './components/Header/Header';
 import Sidebar from './components/Sidebar/Sidebar';
 import Dashboard from './pages/Dashboard';
 import DRE from './pages/DRE';
+import KPIs from './pages/KPIs'; // <- importe aqui
+import Login from './pages/Login';
 
 export default function App() {
-  const [selected, setSelected] = useState('Dashboard');
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [selected, setSelected]   = useState('Dashboard');
   const [reloadKey, setReloadKey] = useState(0);
 
   const handleSelect = (item) => {
@@ -17,6 +20,15 @@ export default function App() {
       setSelected(item);
     }
   };
+
+  const handleLogin = () => {
+    setLoggedIn(true);
+    setSelected('Dashboard'); 
+  };
+
+  if (!loggedIn) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   return (
     <Box
@@ -32,10 +44,7 @@ export default function App() {
       <Header />
 
       <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
-        <Sidebar
-          selectedItem={selected}
-          onSelect={handleSelect}
-        />
+        <Sidebar selectedItem={selected} onSelect={handleSelect} />
 
         <Box
           component="main"
@@ -43,13 +52,16 @@ export default function App() {
             flexGrow: 1,
             overflowY: 'auto',
             width: '100%',
-            p: 0,        // sem padding lateral extra
+            p: 0,
           }}
         >
           <Toolbar />
 
           {selected === 'Dashboard' && <Dashboard key={reloadKey} />}
           {selected === 'DRE'       && <DRE />}
+          {selected === 'KPIs'      && <KPIs />}  {/* <- adicionada a rota de KPIs */}
+          {/* adicione aqui outras páginas conforme precisar */}
+          
         </Box>
       </Box>
     </Box>
