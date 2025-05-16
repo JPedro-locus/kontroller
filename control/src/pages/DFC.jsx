@@ -1,11 +1,10 @@
-// src/pages/KPIs.jsx
+// src/pages/DFC.jsx
 import React, { useState } from 'react';
 import {
   Box,
   Container,
-  Grid,
-  TextField,
   Typography,
+  Grid,
   Paper,
 } from '@mui/material';
 import Sidebar from '../components/Sidebar/Sidebar';
@@ -13,12 +12,9 @@ import TitleBar from '../components/Subtitle';
 import FiltersBar from '../components/FiltersBar';
 import PeriodPicker from '../components/PeriodPicker';
 import DataTable from '../components/DataTable';
-import { useNavigate } from 'react-router-dom';
 
-export default function KPIs() {
-  const navigate = useNavigate();
-  // filtros de topo
-  const [historia, setHistoria]     = useState('Histórico');
+export default function DFC() {
+  // filtros
   const [period, setPeriod]         = useState('');
   const [year, setYear]             = useState('');
   const [kpi, setKpi]               = useState('');
@@ -26,36 +22,21 @@ export default function KPIs() {
   const [scenario, setScenario]     = useState('');
   const [baseBudget, setBaseBudget] = useState('');
 
-  // indicadores principais
-  const metricNames = [
-    'MRR',
-    'ARR',
-    'Churn Rate',
-    'CAC',
-    'LTV',
-    'Net Revenue',
-    'Gross Margin',
-    'Active Users',
-    'New Customers',
-    'Support Tickets',
-  ];
-
-  // meses completos (para tabela principal)
+  // dados
   const months = [
     'Jan-22','Fev-22','Mar-22','Abr-22',
     'Mai-22','Jun-22','Jul-22','Ago-22',
-    'Set-22','Out-22','Nov-22','Dez-22',
   ];
-  // alterna Real/Forecast para cada mês
+  const rows = [
+    { label: 'Recebimentos Operacionais', unit: 'R$', values: [120,130,125,140,150,145,160,170] },
+    { label: 'Investimentos',             unit: 'R$', values: [-50,-60,-55,-70,-65,-60,-75,-80] },
+    { label: 'Financiamentos',            unit: 'R$', values: [30,25,20,15,10,5,0,-5] },
+  ];
+
+  // Intercala Real / Forecast nas colunas
   const viewLabels = months.map((_, i) =>
     i % 2 === 0 ? 'Real' : 'Forecast'
   );
-  // gera linhas para a tabela principal
-  const rows = metricNames.map((label, ri) => ({
-    label,
-    unit: "R$'000'",
-    values: months.map((_, mi) => (ri + 1) * 1000 + mi * 120),
-  }));
 
   // comparar períodos
   const [periods, setPeriods] = useState([
@@ -63,49 +44,29 @@ export default function KPIs() {
     { label: 'Período 2', start: '', end: '' },
   ]);
   const handlePeriodConfirm = idx => ({ start, end }) => {
-    setPeriods(prev => {
-      const copy = [...prev];
-      copy[idx] = { ...copy[idx], start, end };
-      return copy;
+    setPeriods(p => {
+      const c = [...p];
+      c[idx] = { ...c[idx], start, end };
+      return c;
     });
   };
   const handlePeriodCancel = idx => {
-    setPeriods(prev => {
-      const copy = [...prev];
-      copy[idx] = { ...copy[idx], start: '', end: '' };
-      return copy;
+    setPeriods(p => {
+      const c = [...p];
+      c[idx] = { ...c[idx], start: '', end: '' };
+      return c;
     });
   };
 
-  // configura tabela de comparação só de Jan-Mar
-  const compMonths = ['Jan-22','Jan-22','Fev-22','Fev-22','Mar-22','Mar-22'];
-  const compViewLabels = compMonths.map((_, i) =>
-    i % 2 === 0 ? 'Real' : 'Forecast'
-  );
-  const compRows = metricNames.map((label, ri) => ({
-    label,
-    unit: "R$'000'",
-    values: compMonths.map((m, mi) => {
-      const base = (ri + 1) * 1000 + months.indexOf(m) * 120;
-      return mi % 2 === 0
-        ? base
-        : Math.round(base * 1.1); // exemplo Forecast = +10%
-    }),
-  }));
-
   return (
     <Box sx={{ display: 'flex', height: '100%', width: '100%' }}>
-      <Sidebar selectedItem="KPIs" onSelect={() => {}} />
+      <Sidebar selectedItem="DFC" onSelect={() => {}} />
 
       <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
         <Container maxWidth={false} disableGutters>
-
           {/* cabeçalho */}
           <TitleBar
-            title="KPIs"
-            showHistoryToggle
-            historyValue={historia}
-            onHistoryChange={(_, v) => v && setHistoria(v)}
+            title="DFC"
             showSelect
             selectLabel="Orçamento base"
             selectOptions={[
@@ -115,15 +76,13 @@ export default function KPIs() {
             ]}
             selectValue={baseBudget}
             onSelectChange={e => setBaseBudget(e.target.value)}
-            showCreateButton
-            createButtonText="Criar KPI"
-            onCreate={() => navigate('/kpis/novo')} 
             showDownloadButton
             downloadButtonText="Download"
             onDownload={() => {}}
           />
+
           {/* filtros */}
-          <Box mb={4}>
+          <Box mb={3}>
             <FiltersBar
               periodOptions={[
                 { value: 'ultimos30', label: 'Últimos 30 dias' },
@@ -131,10 +90,10 @@ export default function KPIs() {
               ]}
               periodValue={period}
               onPeriodChange={e => setPeriod(e.target.value)}
-              yearOptions={[2025, 2024, 2023, 2022]}
+              yearOptions={[2025,2024,2023,2022]}
               yearValue={year}
               onYearChange={e => setYear(e.target.value)}
-              kpiOptions={metricNames}
+              kpiOptions={['Recebimentos Operacionais','Investimentos','Financiamentos']}
               kpiValue={kpi}
               onKpiChange={e => setKpi(e.target.value)}
               viewOptions={[
@@ -144,25 +103,21 @@ export default function KPIs() {
               ]}
               viewValue={view}
               onViewChange={(_, v) => v && setView(v)}
-              scenarioOptions={['Base', 'Otimista', 'Pessimista']}
+              scenarioOptions={['Base','Otimista','Pessimista']}
               scenarioValue={scenario}
               onScenarioChange={e => setScenario(e.target.value)}
             />
           </Box>
 
-          {/* tabela principal */}
-          <DataTable
-            rows={rows}
-            months={months}
-            viewLabels={viewLabels}
-          />
+          {/* tabela estilizada */}
+          <DataTable rows={rows} months={months} viewLabels={viewLabels} />
 
           {/* comparar períodos */}
           <Typography variant="h6" gutterBottom>
             Comparar períodos
           </Typography>
-          <Grid container spacing={2} mb={4}>
-            {periods.map((p, i) => (
+          <Grid container spacing={2}>
+            {periods.map((p,i) => (
               <Grid item xs={12} md={4} key={p.label}>
                 <PeriodPicker
                   label={p.label}
@@ -188,16 +143,6 @@ export default function KPIs() {
               </Paper>
             </Grid>
           </Grid>
-
-          {/* tabela de comparação Jan-22 a Mar-22 */}
-          <Typography variant="h6" gutterBottom>
-            Comparação Jan-22 a Mar-22
-          </Typography>
-          <DataTable
-            rows={compRows}
-            months={compMonths}
-            viewLabels={compViewLabels}
-          />
         </Container>
       </Box>
     </Box>

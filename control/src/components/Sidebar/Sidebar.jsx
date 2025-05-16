@@ -1,100 +1,106 @@
 // src/components/Sidebar/Sidebar.jsx
 import React from 'react';
+import { useLocation, NavLink } from 'react-router-dom';
+import { styled } from '@mui/material/styles';
 import {
   Drawer,
   List,
   ListItem,
-  Box,
+  ListItemButton,
   Typography,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import ListItemButton from '@mui/material/ListItemButton';
-import StarsIcon from '@mui/icons-material/Stars';
+
+import DashboardIcon      from '@mui/icons-material/Dashboard';
+import ShowChartIcon      from '@mui/icons-material/ShowChart';
+import BarChartIcon       from '@mui/icons-material/BarChart';
+import AssessmentIcon     from '@mui/icons-material/Assessment';
+import ReceiptIcon        from '@mui/icons-material/Receipt';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import SettingsIcon       from '@mui/icons-material/Settings';
+import AccountTreeIcon    from '@mui/icons-material/AccountTree';
 
 const drawerWidth = 72;
 
-const IconWrapper = styled(Box, {
+const StyledDrawer = styled(Drawer)(({ theme }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  '& .MuiDrawer-paper': {
+    width: drawerWidth,
+    boxSizing: 'border-box',
+    backgroundColor: theme.palette.primary.main,
+    color: '#fff',
+    border: 'none',
+    borderRadius: '0 16px 16px 0',
+    overflow: 'hidden',
+  },
+}));
+
+const IconWrapper = styled('div', {
   shouldForwardProp: (prop) => prop !== 'active',
 })(({ theme, active }) => ({
-  // quando ativo: formato “pill” roxo
   width: active ? 56 : 40,
   height: active ? 32 : 40,
   borderRadius: active ? 16 : '50%',
-  backgroundColor: active ? '#E8DEF8' : 'transparent',
+  backgroundColor: active
+    ? theme.palette.primary.dark
+    : 'transparent',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: active
-    ? theme.palette.primary.main
-    : theme.palette.text.primary,
   transition: 'all 0.2s',
 }));
 
-const MenuButton = styled(ListItemButton)(({ theme }) => ({
+const MenuButton = styled(ListItemButton)(({ theme, selected }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   paddingTop: theme.spacing(0.5),
   paddingBottom: theme.spacing(0.5),
+  backgroundColor: selected
+    ? theme.palette.primary.dark
+    : 'transparent',
   '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-  },
-  '&.Mui-selected': {
-    backgroundColor: 'transparent',
+    backgroundColor: theme.palette.primary.dark + '33',
   },
 }));
 
 const menuItems = [
-  'Dashboard',
-  'DRE',
-  'DFC',
-  'KPIs',
-  'Orçamentos',
-  'Simulação',
-  'Previsões',
-  'Grupo de contas',
-].map((text) => ({
-  text,
-  icon: <StarsIcon fontSize="small" />,
-}));
+  { text: 'Dashboard',     icon: DashboardIcon,      to: '/dashboard' },
+  { text: 'DRE',           icon: ShowChartIcon,      to: '/dre' },
+  { text: 'DFC',           icon: BarChartIcon,       to: '/dfc' },
+  { text: 'KPIs',          icon: AssessmentIcon,     to: '/kpis' },
+  { text: 'Orçamentos',    icon: ReceiptIcon,        to: '/orcamentos' },
+  { text: 'Simulação',     icon: MonetizationOnIcon, to: '/simulacao' },
+  { text: 'Previsões',     icon: SettingsIcon,       to: '/previsoes' },
+  { text: 'Grupo de contas', icon: AccountTreeIcon,  to: '/grupo-de-contas' },
+];
 
-export default function Sidebar({ selectedItem, onSelect }) {
+export default function Sidebar() {
+  const { pathname } = useLocation();
+
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-          backgroundColor: '#fafafa',
-          borderRight: '1px solid #eee',
-          pt: 1, // aproxima os itens do topo
-        },
-      }}
-    >
-      <List disablePadding>
-        {menuItems.map(({ text, icon }) => {
-          const isActive = selectedItem === text;
+    <StyledDrawer variant="permanent">
+      <List disablePadding sx={{ mt: 2 }}>
+        {menuItems.map(({ text, icon: Icon, to }) => {
+          const isActive = pathname === to;
           return (
             <ListItem key={text} disablePadding>
               <MenuButton
+                component={NavLink}
+                to={to}
                 selected={isActive}
-                onClick={() => onSelect(text)}
+                end
               >
                 <IconWrapper active={isActive}>
-                  {icon}
+                  <Icon htmlColor="#fff" />
                 </IconWrapper>
                 <Typography
                   variant="caption"
                   sx={{
-                    mt: 0.25,
-                    textAlign: 'center',
+                    mt: 0.5,
                     fontWeight: isActive ? 'bold' : 'normal',
-                    color: isActive
-                      ? 'text.primary'
-                      : 'text.secondary',
+                    color: '#fff',
+                    textAlign: 'center',
                   }}
                 >
                   {text}
@@ -104,6 +110,6 @@ export default function Sidebar({ selectedItem, onSelect }) {
           );
         })}
       </List>
-    </Drawer>
+    </StyledDrawer>
   );
 }

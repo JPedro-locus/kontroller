@@ -1,26 +1,22 @@
 // src/pages/Dashboard.jsx
 import React, { useState } from 'react';
 import {
-  Container,
   Box,
+  Container,
   Grid,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  Paper,
 } from '@mui/material';
-import ClearIcon from '@mui/icons-material/Clear';
+import Sidebar from '../components/Sidebar/Sidebar';
+import TitleBar from '../components/Subtitle';
+import FiltersBar from '../components/FiltersBar';
 import InfoCard from '../components/InfoCard';
 import ChartCard from '../components/ChartCard';
+import PeriodPicker from '../components/PeriodPicker';
 
-// ─── Exemplos de configurações de gráfico ────────────────────────
-// 1) Gráfico de barras
+// ─── Configuração do gráfico de barras ───────────────────────────
 const barOptions = {
   chart: { type: 'bar' },
-  plotOptions: {
-    bar: { horizontal: false, columnWidth: '60%', borderRadius: 4 },
-  },
+  plotOptions: { bar: { horizontal: false, columnWidth: '60%', borderRadius: 4 } },
   xaxis: {
     categories: [
       'Jan','Fev','Mar','Abr','Mai','Jun',
@@ -35,227 +31,130 @@ const barSeries = [
   { name: 'Realizado', data: [25,38,30,45,50,40,55,45,43,60,66,55] },
 ];
 
-// 2) Radial completo
-const radialFullOptions = {
-  chart: { type: 'radialBar' },
-  plotOptions: {
-    radialBar: {
-      startAngle: -135,
-      endAngle:   135,
-      hollow: { size: '60%' },
-      dataLabels: {
-        name: { show: false },
-        value: { offsetY: 5, fontSize: '16px' },
-      },
-    },
-  },
-  colors: ['#000000','#FFFFFF','#757575'],
-};
-const radialFullSeries = [50, 30, 20];
-
-// 3) Semicírculo
-const radialSemiOptions = {
-  chart: { type: 'radialBar' },
-  plotOptions: {
-    radialBar: {
-      startAngle: -90,
-      endAngle:   90,
-      hollow: { size: '60%' },
-      dataLabels: {
-        name: { show: false },
-        value: { offsetY: 0, fontSize: '16px' },
-      },
-    },
-  },
-  colors: ['#555555','#f5f5f5'],
-};
-const radialSemiSeries = [60];
-
 export default function Dashboard() {
-  // filtros
-  const [period,   setPeriod]   = useState('');
-  const [month,    setMonth]    = useState('');
-  const [year,     setYear]     = useState('');
-  const [category, setCategory] = useState('');
+  // ─── estados de filtro ───────────────────────────
+  const [period,    setPeriod]    = useState('');
+  const [year,      setYear]      = useState('');
+  const [kpi,       setKpi]       = useState('');
+  const [view,      setView]      = useState('realxorcado');
+  const [baseBudget,setBaseBudget]= useState('');
 
-  const handleReset = () => {
-    setPeriod('');
-    setMonth('');
-    setYear('');
-    setCategory('');
-    // Aqui você também pode recarregar dados filtrados
-  };
+  // ─── “Pills” de visão ───────────────────────────
+  const views = [
+    { key: 'realxorcado', label: 'Real X Orçado' },
+    { key: 'forecast',    label: 'Forecast' },
+    { key: 'favoritos',   label: 'Favoritos' },
+  ];
 
-  // favoritos
-  const [favorites, setFavorites] = useState({
-    saldo: false,
-    mrr:   true,
-    churn: false,
-    ebitda:false,
-    bar:   false,
-    full:  false,
-    semi:  false,
-  });
-  const toggle = (key) =>
-    setFavorites((f) => ({ ...f, [key]: !f[key] }));
+  // ─── Dropdowns ───────────────────────────
+  const periodOptions = [
+    { value: 'ultimos30', label: 'Últimos 30 dias' },
+    { value: 'mesAtual',  label: 'Mês atual' },
+  ];
+  const yearOptions = ['2023','2024','2025','2026'];
+  const kpiOptions  = ['MRR','ARR','Churn Rate','CAC','LTV'];
 
   return (
-    <Container maxWidth={false} disableGutters sx={{ p: 3 }}>
-      {/* ─── BARRA DE FILTROS ─────────────────────────────────────── */}
-      <Box
-        sx={{
-          mb: 3,
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          gap: 1.5,
-        }}
-      >
-        <Button
-          startIcon={<ClearIcon />}
-          onClick={handleReset}
-          sx={{
-            backgroundColor: '#F8D3E1',
-            color: '#000',
-            '&:hover': { backgroundColor: '#F0C4D2' },
-            boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
-            borderRadius: 2,
-            px: 2.5,
-          }}
-        >
-          Resetar filtros
-        </Button>
+    <Box sx={{ display: 'flex', height: '100%', width: '100%' }}>
+      <Sidebar selectedItem="Dashboard" onSelect={() => {}} />
 
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>Período</InputLabel>
-          <Select
-            value={period}
-            label="Período"
-            onChange={(e) => setPeriod(e.target.value)}
-          >
-            <MenuItem value=""><em>Todos</em></MenuItem>
-            <MenuItem value="hoje">Hoje</MenuItem>
-            <MenuItem value="semana">Essa semana</MenuItem>
-            <MenuItem value="mes">Esse mês</MenuItem>
-          </Select>
-        </FormControl>
+      <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+        <Container maxWidth={false} disableGutters>
 
-        <FormControl size="small" sx={{ minWidth: 100 }}>
-          <InputLabel>Mês</InputLabel>
-          <Select
-            value={month}
-            label="Mês"
-            onChange={(e) => setMonth(e.target.value)}
-          >
-            {['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].map(m => (
-              <MenuItem key={m} value={m}>{m}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+          {/* ─── Cabeçalho: Título + Select Orçamento + Download ───────────────────────────────────── */}
+          <TitleBar
+            title="Dashboard"
+            showSelect
+            selectLabel="Orçamento base"
+            selectOptions={[
+              { value: 'jan', label: 'Jan' },
+              { value: 'fev', label: 'Fev' },
+              { value: 'mar', label: 'Mar' },
+            ]}
+            selectValue={baseBudget}
+            onSelectChange={e => setBaseBudget(e.target.value)}
+            showDownloadButton
+            downloadButtonText="Download"
+            onDownload={() => {}}
+          />
 
-        <FormControl size="small" sx={{ minWidth: 80 }}>
-          <InputLabel>Ano</InputLabel>
-          <Select
-            value={year}
-            label="Ano"
-            onChange={(e) => setYear(e.target.value)}
-          >
-            {[2025,2024,2023,2022].map(y => (
-              <MenuItem key={y} value={y}>{y}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+          {/* ─── Filtros: Período, Ano, KPI, Pills ───────────────────────────────────────────────────── */}
+          <Box mb={4}>
+            <FiltersBar
+              periodOptions={periodOptions}
+              periodValue={period}
+              onPeriodChange={e => setPeriod(e.target.value)}
 
-        <FormControl size="small" sx={{ minWidth: 140 }}>
-          <InputLabel>Categoria</InputLabel>
-          <Select
-            value={category}
-            label="Categoria"
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <MenuItem value=""><em>Todas</em></MenuItem>
-            <MenuItem value="financeiro">Financeiro</MenuItem>
-            <MenuItem value="operacional">Operacional</MenuItem>
-            <MenuItem value="comercial">Comercial</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+              yearOptions={yearOptions}
+              yearValue={year}
+              onYearChange={e => setYear(e.target.value)}
 
-      {/* ─── PRIMEIRA LINHA: CARDS INFORMATIVOS ───────────────────── */}
-      <Grid container spacing={2}>
-        {[
-          { key: 'saldo',  title: 'Saldo no caixa', value: 'R$ 000000,00' },
-          { key: 'mrr',    title: 'MRR',             value: 'R$ 000000,00' },
-          { key: 'churn',  title: 'Churn rate',      value: '4,5%'       },
-          { key: 'ebitda', title: 'EBITDA',          value: '18%'        },
-        ].map(({ key, title, value }) => (
-          <Grid item xs key={key}>
-            <InfoCard
-              title={title}
-              value={value}
-              changePercent="9% atualizado 9 de maio"
-              favorite={favorites[key]}
-              onToggleFavorite={() => toggle(key)}
+              kpiOptions={kpiOptions}
+              kpiValue={kpi}
+              onKpiChange={e => setKpi(e.target.value)}
+
+              viewOptions={views}
+              viewValue={view}
+              onViewChange={(_, v) => v && setView(v)}
+
+              scenarioOptions={[]}        // não usado aqui
+              scenarioValue=""
+              onScenarioChange={() => {}}
             />
-          </Grid>
-        ))}
-      </Grid>
+          </Box>
 
-      {/* ─── SEGUNDA LINHA: CARDS DE GRÁFICO ─────────────────────── */}
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        <Grid item xs={12} md={6}>
-          <ChartCard
-            title="Lorem ipsum"
-            series={barSeries}
-            options={{
-              ...barOptions,
-              chart: { ...barOptions.chart},
-            }}
-            legend={[
-              { label: 'Orçado', color: '#000000' },
-              { label: 'Realizado', color: '#757575' },
-            ]}
-            updatedAt="Atualizado 9 de maio"
-            favorite={favorites.bar}
-            onToggleFavorite={() => toggle('bar')}
-            chartWidth="200%"
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <ChartCard
-            title="Lorem ipsum"
-            series={radialFullSeries}
-            options={{
-              ...radialFullOptions,
-              chart: { ...radialFullOptions.chart },
-            }}
-            legend={[
-              { label: 'Lorem ipsum', color: '#000000' },
-              { label: 'Lorem ipsum', color: '#FFFFFF' },
-              { label: 'Lorem ipsum', color: '#757575' },
-            ]}
-            updatedAt="Atualizado 9 de maio"
-            favorite={favorites.full}
-            onToggleFavorite={() => toggle('full')}
-            chartWidth='120%'
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <ChartCard
-            title="Lorem ipsum"
-            series={radialSemiSeries}
-            options={{
-              ...radialSemiOptions,
-              chart: { ...radialSemiOptions.chart, height: 200 },
-            }}
-            legend={null}
-            updatedAt="Atualizado 9 de maio"
-            favorite={favorites.semi}
-            onToggleFavorite={() => toggle('semi')}
-            chartWidth='200%'
-          />
-        </Grid>
-      </Grid>
-    </Container>
+          {/* ─── Destaques ───────────────────────────────────────────────────────────────────────────── */}
+          <Grid container spacing={2} sx={{ mb: 4 }}>
+            <Grid item xs={6} md={3}>
+              <InfoCard
+                title="Lorem ipsum"
+                value="R$ 000000,00"
+                changePercent="↑ 9%"
+                updatedAt="Atualizado em 9 de maio"
+                favorite
+                onToggleFavorite={() => {}}
+              />
+            </Grid>
+            <Grid item xs={6} md={3}>
+              <Paper
+                onClick={() => {}}
+                sx={{
+                  height: '100%',
+                  p: 2,
+                  border: '2px dashed rgba(0,0,0,0.2)',
+                  borderRadius: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'text.secondary',
+                  cursor: 'pointer',
+                }}
+              >
+                + Adicionar destaque
+              </Paper>
+            </Grid>
+          </Grid>
+
+          {/* ─── Gráfico de barras ──────────────────────────────────────────────────────────────────── */}
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <ChartCard
+                title="Lorem ipsum"
+                options={barOptions}
+                series={barSeries}
+                legend={[
+                  { label: 'Orçado',    color: '#000' },
+                  { label: 'Realizado', color: '#757575' },
+                ]}
+                updatedAt="Atualizado em 9 de maio"
+                favorite={false}
+                onToggleFavorite={() => {}}
+                chartWidth="200%"
+              />
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+    </Box>
   );
 }

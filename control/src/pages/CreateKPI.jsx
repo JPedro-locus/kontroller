@@ -3,7 +3,6 @@ import {
   Box,
   Container,
   Grid,
-  Typography,
   Paper,
   IconButton,
   TextField,
@@ -11,13 +10,17 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Typography,
   Button,
-  Chip
+  Chip,
+  Divider
 } from '@mui/material';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ClearIcon from '@mui/icons-material/Clear';
+import { ArrowBackIosNew, Clear, Add, NoEncryption } from '@mui/icons-material';
+import { pink } from '@mui/material/colors';
+import { useNavigate } from 'react-router-dom';  
 
-export default function CreateKPI({ onBack }) {
+export default function CreateKPI() {
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [unit, setUnit] = useState('');
@@ -25,49 +28,73 @@ export default function CreateKPI({ onBack }) {
   const [formatting, setFormatting] = useState([]);
 
   const handleAddFormatting = () => {
-    setFormatting(f => [...f, { id: Date.now(), label: 'Nova regra' }]);
+    setFormatting([{ id: Date.now(), label: 'Formatação condicional' }]);
   };
-  const handleRemoveFormatting = id => setFormatting(f => f.filter(x => x.id !== id));
+  const handleRemoveFormatting = () =>
+    setFormatting([]);
   const handleClear = () => {
     setName(''); setCategory(''); setUnit(''); setFormula(''); setFormatting([]);
   };
   const handleSave = () => {
     console.log({ name, category, unit, formula, formatting });
+    navigate('/kpis'); 
   };
 
   return (
     <Container maxWidth={false} disableGutters>
-      {/* Breadcrumb / back */}
-      <Box sx={{ display: 'flex', alignItems: 'center', p: 3 }}>
-        <IconButton onClick={onBack}>
-          <ArrowBackIosNewIcon fontSize="small" />
+      {/* Cabeçalho */}
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, px: 3, pt: 3 }}>
+        <IconButton onClick={() => navigate('/kpis')}>  {/* ← navega aqui */}
+          <ArrowBackIosNew fontSize="small" />
         </IconButton>
-        <Typography variant="h4">Criar KPI</Typography>
+        <Typography variant="h5" sx={{ ml: 1 }}>
+          KPIs
+        </Typography>
       </Box>
 
-      <Grid container spacing={2} px={3} sx={{ pb: 3 }}>
-        {/* Dados básicos */}
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3, borderRadius: 2 }}>
-            <Typography variant="h6" gutterBottom>Dados básicos</Typography>
+      {/* Card geral */}
+      <Paper
+        elevation={0}
+        sx={{
+          bgcolor: '#F8F6FF',
+          borderRadius: 2,
+          mx: 3,
+          mb: 3,
+          overflow: 'hidden',
+        }}
+      >
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
+          {/* Coluna esquerda */}
+          <Box sx={{ flex: 1, p: 3 }}>
+            <Typography variant="h4" gutterBottom>
+              Dados básicos
+            </Typography>
             <Box component="form" noValidate autoComplete="off">
               <TextField
-                fullWidth label="Nome" placeholder="Digite o nome do KPI…"
-                value={name} onChange={e => setName(e.target.value)}
+                fullWidth
+                label="Nome"
+                placeholder="Digite o nome do KPI…"
+                value={name}
+                onChange={e => setName(e.target.value)}
                 InputProps={{
                   endAdornment: name && (
                     <IconButton size="small" onClick={() => setName('')}>
-                      <ClearIcon fontSize="small" />
+                      <Clear fontSize="small" />
                     </IconButton>
                   )
                 }}
                 helperText="Obrigatório"
-                sx={{ mb: 2 }}
+                FormHelperTextProps={{
+                  sx: { backgroundColor: '#F8F6FF' }
+                }}
+                sx={{ mb: 2, backgroundColor: '#F8F6FF', borderRadius: 1 }}
               />
-              <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+
+              <FormControl fullWidth size="medium" sx={{ mb: 2, backgroundColor: '#F8F6FF', borderRadius: 1 , border: 'none'}}>
                 <InputLabel>Categoria</InputLabel>
                 <Select
-                  value={category} label="Categoria"
+                  value={category}
+                  label="Categoria"
                   onChange={e => setCategory(e.target.value)}
                 >
                   <MenuItem value=""><em>Selecione…</em></MenuItem>
@@ -75,12 +102,16 @@ export default function CreateKPI({ onBack }) {
                   <MenuItem value="operacional">Operacional</MenuItem>
                   <MenuItem value="comercial">Comercial</MenuItem>
                 </Select>
-                <Typography variant="caption" color="text.secondary">Obrigatório</Typography>
+                <Typography variant="caption" sx={{ backgroundColor: '#F8F6FF' }}>
+                  Obrigatório
+                </Typography>
               </FormControl>
-              <FormControl fullWidth size="small">
+
+              <FormControl fullWidth size="medium" sx={{ backgroundColor: '#F8F6FF', borderRadius: 1 }}>
                 <InputLabel>Unidade</InputLabel>
                 <Select
-                  value={unit} label="Unidade"
+                  value={unit}
+                  label="Unidade"
                   onChange={e => setUnit(e.target.value)}
                 >
                   <MenuItem value=""><em>Selecione…</em></MenuItem>
@@ -88,62 +119,74 @@ export default function CreateKPI({ onBack }) {
                   <MenuItem value="percent">%</MenuItem>
                   <MenuItem value="unit">Unit</MenuItem>
                 </Select>
-                <Typography variant="caption" color="text.secondary">Obrigatório</Typography>
+                <Typography variant="caption" sx={{ backgroundColor: '#F8F6FF' }}>
+                  Obrigatório
+                </Typography>
               </FormControl>
             </Box>
-          </Paper>
-        </Grid>
+          </Box>
 
-        {/* Fórmula e formatação */}
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3, borderRadius: 2 }}>
-            <Typography variant="h6" gutterBottom>Fórmula e formatação</Typography>
+          {/* Divisor vertical */}
+          <Divider orientation="vertical" flexItem />
+
+          {/* Coluna direita */}
+          <Box sx={{ flex: 1, p: 3 }}>
+            <Typography variant="h4" gutterBottom>
+              Fórmula e formatação
+            </Typography>
+
             <TextField
-              fullWidth size="small" label="Digite a fórmula"
-              placeholder="Digite e.g. `valor1 / valor2 * 100`"
-              value={formula} onChange={e => setFormula(e.target.value)}
+              fullWidth
+              size="medium"
+              label="Digite a fórmula"
+              placeholder="Digite e.g. valor1 / valor2 * 100"
+              value={formula}
+              onChange={e => setFormula(e.target.value)}
               InputProps={{
                 endAdornment: formula && (
                   <IconButton size="small" onClick={() => setFormula('')}>
-                    <ClearIcon fontSize="small" />
+                    <Clear fontSize="small" />
                   </IconButton>
                 )
               }}
               helperText="Digite @ para ver variáveis disponíveis"
-              sx={{ mb: 2 }}
+              FormHelperTextProps={{
+                sx: { backgroundColor: '#F8F6FF' }
+              }}
+              sx={{ mb: 2, backgroundColor: '#F8F6FF', borderRadius: 1 }}
             />
 
-            <Box sx={{ mb: 2 }}>
-              <Button size="small" variant="outlined" onClick={handleAddFormatting} sx={{ mr: 1 }}>
-                + Adicionar
-              </Button>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
               <Button
-                size="small" variant="contained" color="secondary"
-                disabled={formatting.length === 0}
+                size="medium"
+                variant="contained"
+                onClick={handleAddFormatting}
+                sx={{backgroundColor: '#0040FE', borderRadius: 20, fontSize: 10, padding:1.5, paddingLeft: 3, paddingRight: 3}}
               >
-                Formatação condicional
+                <Add sx={{marginRight:1}}/> Adicionar
+              </Button>
+
+              {formatting.length > 0 && (
+                <Chip
+                  label={formatting[0].label}
+                  onDelete={handleRemoveFormatting}
+                  sx={{
+                    bgcolor: pink[100],
+                    color: pink[800],
+                  }}
+                />
+              )}
+            </Box>
+
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 3, marginTop:30 }}>
+              <Button onClick={handleClear}>Limpar</Button>
+              <Button variant="contained" onClick={handleSave} sx={{backgroundColor: '#0040FE', borderRadius: 20,padding:1.5,paddingLeft: 3, paddingRight: 3}}>
+                Salvar
               </Button>
             </Box>
-
-            {formatting.length > 0 && (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                {formatting.map(item => (
-                  <Chip
-                    key={item.id}
-                    label={item.label}
-                    onDelete={() => handleRemoveFormatting(item.id)}
-                  />
-                ))}
-              </Box>
-            )}
-
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-              <Button onClick={handleClear}>Limpar</Button>
-              <Button variant="contained" onClick={handleSave}>Salvar</Button>
-            </Box>
-          </Paper>
-        </Grid>
-      </Grid>
+          </Box>
+        </Box>
+      </Paper>
     </Container>
   );
 }

@@ -1,91 +1,72 @@
 // src/components/InfoCard.jsx
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
   Card,
+  CardHeader,
   CardContent,
-  Box,
+  IconButton,
   Typography,
-  IconButton
+  Box,
 } from '@mui/material';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import LaunchIcon from '@mui/icons-material/Launch';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
-import StarIcon from '@mui/icons-material/Star';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
-export default function InfoCard({
-  title,
-  value,
-  changePercent,
-  updatedAt,
-  favorite,
-  onToggleFavorite
-}) {
+export default function InfoCard({ title, value, change, updatedAt }) {
   return (
-    <Card sx={{ borderRadius: 2, bgcolor: '#f5f5f5' }}>
-      <CardContent>
-        {/* Cabeçalho: título + ícone de info + ícone de abrir */}
-        <Box display="flex" alignItems="center">
-          <Typography variant="body2" fontWeight={500}>
+    <Card
+      sx={{
+        bgcolor: '#F3E8FF',
+        borderRadius: 2,
+        boxShadow: 'none',
+      }}
+    >
+      <CardHeader
+        title={
+          <Typography variant="subtitle2" sx={{ fontWeight: 500 }}>
             {title}
           </Typography>
-          <InfoOutlinedIcon 
-            fontSize="small" 
-            sx={{ mx: 0.5, color: 'text.secondary' }} 
-          />
-          <Box flexGrow={1} />
+        }
+        action={
           <IconButton size="small">
-            <LaunchIcon fontSize="small" />
+            <MoreVertIcon fontSize="small" />
           </IconButton>
-        </Box>
+        }
+        sx={{ pb: 0 }}
+      />
 
-        {/* Valor principal */}
+      <CardContent sx={{ pt: 1 }}>
         <Typography
-          variant="h5"
-          fontWeight={600}
-          sx={{ my: 1 }}
+          variant="h4"
+          component="div"
+          sx={{ fontWeight: 600, mb: 1 }}
         >
           {value}
         </Typography>
 
-        {/* Rodapé: variação % + data + estrela */}
-        <Box display="flex" alignItems="center">
-          {changePercent && (
-            <Box display="flex" alignItems="center">
-              <LaunchIcon
-                sx={{
-                  transform: 'rotate(45deg)',
-                  color: 'success.main',
-                  fontSize: 16
-                }}
-              />
-              <Typography
-                variant="caption"
-                color="success.main"
-                sx={{ ml: 0.5 }}
-              >
-                {changePercent}
-              </Typography>
-            </Box>
-          )}
-          <Box flexGrow={1} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <ArrowUpwardIcon fontSize="small" sx={{ color: 'success.main' }} />
+          <Typography
+            variant="body2"
+            sx={{ color: 'success.main', fontWeight: 600 }}
+          >
+            {change}
+          </Typography>
           <Typography
             variant="caption"
-            color="text.secondary"
+            sx={{ color: 'text.secondary', ml: 1 }}
           >
             {updatedAt}
           </Typography>
-          <IconButton
-            size="small"
-            onClick={onToggleFavorite}
-            sx={{ ml: 0.5 }}
-          >
-            {favorite 
-              ? <StarIcon fontSize="small" color="primary" />
-              : <StarBorderIcon fontSize="small" />
-            }
-          </IconButton>
         </Box>
       </CardContent>
     </Card>
   );
 }
+
+InfoCard.propTypes = {
+  title:      PropTypes.string.isRequired,
+  value:      PropTypes.string.isRequired,
+  change:     PropTypes.string.isRequired,
+  updatedAt:  PropTypes.string.isRequired,
+};
