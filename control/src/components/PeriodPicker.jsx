@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+// src/components/PeriodPicker.jsx
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -80,11 +81,15 @@ export default function PeriodPicker({ label = 'Período', onConfirm, onCancel }
     : isActive
     ? theme.palette.primary.main
     : theme.palette.grey[400];
+
   const labelColor = error
     ? theme.palette.error.main
     : isActive
     ? theme.palette.primary.main
     : theme.palette.text.secondary;
+
+  // mesmo background do card e dos labels, varia no erro
+  const cardBg = error ? '#FFDADB' : '#FBF8FF';
 
   return (
     <Box
@@ -92,8 +97,8 @@ export default function PeriodPicker({ label = 'Período', onConfirm, onCancel }
         borderRadius: 2,
         p: 2,
         position: 'relative',
-        bgcolor: error ? '#FFDADB' : "#FBF8FF",
-        minHeight: 160, // mantém sempre a altura do estado ativo
+        bgcolor: cardBg,
+        minHeight: 160,
       }}
     >
       <Typography variant="subtitle2" sx={{ mb: 2, color: labelColor }}>
@@ -101,9 +106,9 @@ export default function PeriodPicker({ label = 'Período', onConfirm, onCancel }
       </Typography>
 
       <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-        {[
+        {[ 
           { key: 'start', label: 'Início', value: start, setter: setStart },
-          { key: 'end', label: 'Fim', value: end, setter: setEnd }
+          { key: 'end',   label: 'Fim',    value: end,   setter: setEnd }
         ].map(field => (
           <FormControl
             key={field.key}
@@ -113,17 +118,23 @@ export default function PeriodPicker({ label = 'Período', onConfirm, onCancel }
             focused={isActive}
             sx={{
               width: 120,
-              '& .MuiOutlinedInput-notchedOutline': { borderColor },
-              '& .MuiInputLabel-root': {
-                color: labelColor,
-                bgcolor: "#FFDADB",
-                px: 0.5,
-                transform: 'translate(14px, -20px)' // espaço maior acima da borda
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor,
               },
+              // label padrão (dentro da caixa)
+              '& .MuiInputLabel-root': {
+                bgcolor: cardBg,
+                px: 0.5,
+                transform: 'translate(14px, 14px)',
+                color: labelColor,
+              },
+              // label shrink (quando flutua acima)
               '& .MuiInputLabel-shrink': {
-                bgcolor:'#FBF8FF',
-                transform: 'translate(14px, -20px)'
-              }
+                bgcolor: cardBg,
+                px: 0.5,
+                transform: 'translate(14px, -10px)',
+                color: labelColor,
+              },
             }}
           >
             <InputLabel>{field.label}</InputLabel>
@@ -134,13 +145,17 @@ export default function PeriodPicker({ label = 'Período', onConfirm, onCancel }
               onChange={e => field.setter(e.target.value)}
               onFocus={handleFocus}
               onBlur={handleBlur}
-              endAdornment={
-                error && (
-                  <InputAdornment position="end">
-                    <ErrorOutlineIcon color="error" />
-                  </InputAdornment>
-                )
-              }
+              endAdornment={error && (
+                <InputAdornment position="end">
+                  <ErrorOutlineIcon color="error" />
+                </InputAdornment>
+              )}
+              sx={{
+                bgcolor: cardBg,
+                '& .MuiOutlinedInput-input': {
+                  bgcolor: cardBg,
+                },
+              }}
             />
           </FormControl>
         ))}
@@ -153,14 +168,14 @@ export default function PeriodPicker({ label = 'Período', onConfirm, onCancel }
       )}
 
       {isActive && !error && (
-        <Stack direction="row"  >
-          <Button variant="text" onClick={handleClear} sx={{ minWidth: 0 , fontSize:12, marginRight:10 }}>
+        <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+          <Button variant="text" onClick={handleClear} sx={{ fontSize: 12 }}>
             Limpar
           </Button>
-          <Button variant="text" onClick={handleCancel} sx={{ minWidth: 0, fontSize:12 }}>
+          <Button variant="text" onClick={handleCancel} sx={{ fontSize: 12 }}>
             Cancelar
           </Button>
-          <Button variant="text" onClick={handleCancel} sx={{ minWidth: 0, fontSize:12 }}>
+          <Button variant="text" onClick={handleOk} sx={{ fontSize: 12 }}>
             OK
           </Button>
         </Stack>

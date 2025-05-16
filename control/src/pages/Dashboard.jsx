@@ -11,11 +11,10 @@ import TitleBar from '../components/Subtitle';
 import FiltersBar from '../components/FiltersBar';
 import InfoCard from '../components/InfoCard';
 import ChartCard from '../components/ChartCard';
-import PeriodPicker from '../components/PeriodPicker';
 
 // ─── Configuração do gráfico de barras ───────────────────────────
 const barOptions = {
-  chart: { type: 'bar' },
+  chart: { type: 'bar', toolbar: { show: false }, background: 'transparent' },
   plotOptions: { bar: { horizontal: false, columnWidth: '60%', borderRadius: 4 } },
   xaxis: {
     categories: [
@@ -25,6 +24,7 @@ const barOptions = {
   },
   grid: { borderColor: '#e0e0e0' },
   dataLabels: { enabled: false },
+  legend: { show: false },
 };
 const barSeries = [
   { name: 'Orçado',    data: [30,40,35,50,55,45,60,50,48,65,70,60] },
@@ -33,26 +33,64 @@ const barSeries = [
 
 export default function Dashboard() {
   // ─── estados de filtro ───────────────────────────
-  const [period,    setPeriod]    = useState('');
-  const [year,      setYear]      = useState('');
-  const [kpi,       setKpi]       = useState('');
-  const [view,      setView]      = useState('realxorcado');
-  const [baseBudget,setBaseBudget]= useState('');
+  const [period,      setPeriod]      = useState('');
+  const [year,        setYear]        = useState('');
+  const [kpi,         setKpi]         = useState('');
+  const [scenario,    setScenario]    = useState('');
+  const [view,        setView]        = useState('realxorcado');
 
-  // ─── “Pills” de visão ───────────────────────────
+  // ─── listas internas ─────────────────────────────
   const views = [
-    { key: 'realxorcado', label: 'Real X Orçado' },
-    { key: 'forecast',    label: 'Forecast' },
-    { key: 'favoritos',   label: 'Favoritos' },
+    { value: 'realxorcado', label: 'Real X Orçado' },
+    { value: 'forecast',    label: 'Forecast'     },
+    { value: 'favoritos',   label: 'Favoritos'    },
   ];
+  const periodOptions   = [
+    { value: '',           label: 'Todos'           },
+    { value: 'ultimos30',  label: 'Últimos 30 dias' },
+    { value: 'mesAtual',   label: 'Mês atual'       },
+  ];
+  const yearOptions     = ['', '2023','2024','2025','2026'];
+  const kpiOptions      = ['', 'MRR','ARR','Churn Rate','CAC','LTV'];
+  const scenarioOptions = ['', 'Base','Otimista','Pessimista'];
 
-  // ─── Dropdowns ───────────────────────────
-  const periodOptions = [
-    { value: 'ultimos30', label: 'Últimos 30 dias' },
-    { value: 'mesAtual',  label: 'Mês atual' },
-  ];
-  const yearOptions = ['2023','2024','2025','2026'];
-  const kpiOptions  = ['MRR','ARR','Churn Rate','CAC','LTV'];
+  // ─── destaques no estado ─────────────────────────
+  const [highlights, setHighlights] = useState([
+    {
+      id: 1,
+      title: 'Lorem ipsum',
+      value: 'R$ 000000,00',
+      changePercent: '↑ 9%',
+      updatedAt: 'Atualizado em 9 de maio',
+      favorite: true,
+    },
+  ]);
+
+  // ─── adiciona novo destaque ──────────────────────
+  const handleAddHighlight = () => {
+    const nextId = highlights.length
+      ? Math.max(...highlights.map(h => h.id)) + 1
+      : 1;
+    setHighlights([
+      ...highlights,
+      {
+        id: nextId,
+        title: 'Novo destaque',
+        value: 'R$ 000000,00',
+        changePercent: '–',
+        updatedAt: '—',
+        favorite: false,
+      }
+    ]);
+  };
+
+  // ─── limpa todos filtros ─────────────────────────
+  const handleClearAll = () => {
+    setPeriod('');
+    setYear('');
+    setKpi('');
+    setScenario('');
+  };
 
   return (
     <Box sx={{ display: 'flex', height: '100%', width: '100%' }}>
@@ -61,63 +99,71 @@ export default function Dashboard() {
       <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
         <Container maxWidth={false} disableGutters>
 
-          {/* ─── Cabeçalho: Título + Select Orçamento + Download ───────────────────────────────────── */}
+          {/* Cabeçalho */}
           <TitleBar
             title="Dashboard"
-            showSelect
-            selectLabel="Orçamento base"
-            selectOptions={[
-              { value: 'jan', label: 'Jan' },
-              { value: 'fev', label: 'Fev' },
-              { value: 'mar', label: 'Mar' },
-            ]}
-            selectValue={baseBudget}
-            onSelectChange={e => setBaseBudget(e.target.value)}
             showDownloadButton
             downloadButtonText="Download"
             onDownload={() => {}}
           />
 
-          {/* ─── Filtros: Período, Ano, KPI, Pills ───────────────────────────────────────────────────── */}
+          {/* Filtros */}
           <Box mb={4}>
             <FiltersBar
               periodOptions={periodOptions}
               periodValue={period}
               onPeriodChange={e => setPeriod(e.target.value)}
+              onPeriodClear={() => setPeriod('')}
 
               yearOptions={yearOptions}
               yearValue={year}
               onYearChange={e => setYear(e.target.value)}
+              onYearClear={() => setYear('')}
 
               kpiOptions={kpiOptions}
               kpiValue={kpi}
               onKpiChange={e => setKpi(e.target.value)}
+              onKpiClear={() => setKpi('')}
+
+              scenarioOptions={scenarioOptions}
+              scenarioValue={scenario}
+              onScenarioChange={e => setScenario(e.target.value)}
+              onScenarioClear={() => setScenario('')}
 
               viewOptions={views}
               viewValue={view}
               onViewChange={(_, v) => v && setView(v)}
 
-              scenarioOptions={[]}        // não usado aqui
-              scenarioValue=""
-              onScenarioChange={() => {}}
+              onClearAll={handleClearAll}
             />
           </Box>
 
-          {/* ─── Destaques ───────────────────────────────────────────────────────────────────────────── */}
+          {/* Destaques */}
           <Grid container spacing={2} sx={{ mb: 4 }}>
-            <Grid item xs={6} md={3}>
-              <InfoCard
-                title="Lorem ipsum"
-                value="R$ 000000,00"
-                changePercent="↑ 9%"
-                updatedAt="Atualizado em 9 de maio"
-                favorite
-                onToggleFavorite={() => {}}
-              />
-            </Grid>
+            {highlights.map(h => (
+              <Grid item xs={6} md={3} key={h.id}>
+                <InfoCard
+                  title={h.title}
+                  value={h.value}
+                  changePercent={h.changePercent}
+                  updatedAt={h.updatedAt}
+                  favorite={h.favorite}
+                  onToggleFavorite={() =>
+                    setHighlights(highlights =>
+                      highlights.map(item =>
+                        item.id === h.id
+                          ? { ...item, favorite: !item.favorite }
+                          : item
+                      )
+                    )
+                  }
+                />
+              </Grid>
+            ))}
+
             <Grid item xs={6} md={3}>
               <Paper
-                onClick={() => {}}
+                onClick={handleAddHighlight}
                 sx={{
                   height: '100%',
                   p: 2,
@@ -135,7 +181,7 @@ export default function Dashboard() {
             </Grid>
           </Grid>
 
-          {/* ─── Gráfico de barras ──────────────────────────────────────────────────────────────────── */}
+          {/* Gráfico de barras */}
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <ChartCard
@@ -153,6 +199,7 @@ export default function Dashboard() {
               />
             </Grid>
           </Grid>
+
         </Container>
       </Box>
     </Box>

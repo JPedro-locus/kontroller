@@ -2,158 +2,282 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  Grid,
+  Box,
+  Button,
+  Divider,
   FormControl,
   InputLabel,
-  Select,
   MenuItem,
+  Select,
   ToggleButton,
   ToggleButtonGroup,
-  Divider,
+  IconButton,
+  Typography,
 } from '@mui/material';
+import CancelIcon from '@mui/icons-material/Cancel';
+
+function FilterTag({ label, onDelete }) {
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        bgcolor: '#0040FE',
+        borderRadius: '40px',
+        height: 40,
+        pl: 2,
+        pr: 0.5,
+      }}
+    >
+      <Typography variant="body2" sx={{ color: '#fff', whiteSpace: 'nowrap' }}>
+        {label}
+      </Typography>
+      <Divider
+        orientation="vertical"
+        flexItem
+        sx={{ bgcolor: 'rgba(255,255,255,0.5)', mx: 1, height: 30 }}
+      />
+      <IconButton size="small" onClick={onDelete} sx={{ color: '#fff', p: 0 }}>
+        <CancelIcon fontSize="small" />
+      </IconButton>
+    </Box>
+  );
+}
 
 export default function FiltersBar({
-  // dropdown “Período”
-  periodOptions,
-  periodValue,
-  onPeriodChange,
-  // dropdown “Ano”
-  yearOptions,
-  yearValue,
-  onYearChange,
-  // dropdown “KPI”
-  kpiOptions,
-  kpiValue,
-  onKpiChange,
-  // toggle Real X Orçado / Forecast / Favoritos
-  viewOptions,
-  viewValue,
-  onViewChange,
-  // dropdown “Cenários”
-  scenarioOptions,
-  scenarioValue,
-  onScenarioChange,
+  // filtros
+  periodOptions, periodValue, onPeriodChange, onPeriodClear,
+  yearOptions,   yearValue,   onYearChange,   onYearClear,
+  kpiOptions,    kpiValue,    onKpiChange,    onKpiClear,
+  scenarioOptions, scenarioValue, onScenarioChange, onScenarioClear,
+
+  // pills de visão
+  viewOptions, viewValue, onViewChange,
+
+  // limpar todos
+  onClearAll,
 }) {
+  const hasAny = Boolean(periodValue||yearValue||kpiValue||scenarioValue);
+
   return (
-    <Grid container alignItems="center" spacing={2}>
-      {/* Período */}
-      <Grid item>
-        <FormControl size="small" sx={{ minWidth: 150,marginRight: 2 }}>
-          <InputLabel>Período</InputLabel>
-          <Select
-            value={periodValue}
-            label="Período"
-            onChange={onPeriodChange}
-          >
-            {periodOptions.map((opt) => (
-              <MenuItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-
-      {/* Ano */}
-      <Grid item>
-        <FormControl size="small" sx={{ minWidth: 150,marginRight: 2 }}>
-          <InputLabel>Ano</InputLabel>
-          <Select
-            value={yearValue}
-            label="Ano"
-            onChange={onYearChange}
-          >
-            {yearOptions.map((opt) => (
-              <MenuItem key={opt} value={opt}>
-                {opt}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-
-      {/* KPI */}
-      <Grid item>
-        <FormControl size="small" sx={{ minWidth: 150,marginRight: 2 }}>
-          <InputLabel>KPI</InputLabel>
-          <Select
-            value={kpiValue}
-            label="KPI"
-            onChange={onKpiChange}
-          >
-            {kpiOptions.map((opt) => (
-              <MenuItem key={opt} value={opt}>
-                {opt}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-
-      {/* ToggleView */}
-      <Grid item>
-        <ToggleButtonGroup
-          size="small"
-          exclusive
-          value={viewValue}
-          onChange={onViewChange}
+    <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
+      {/* 1) Limpar filtros */}
+      {hasAny && (
+        <Button
+          startIcon={<CancelIcon sx={{ color: '#D32F2F' }} />}
+          onClick={onClearAll}
+          sx={{
+            bgcolor: '#FFEAEA',
+            color: '#D32F2F',
+            textTransform: 'none',
+            borderRadius: '20px',
+            height: 64,
+            px: 2,
+            boxShadow: '0px 4px 8px rgba(0,0,0,0.1)',
+            '&:hover': {
+              bgcolor: '#FFD7D7',
+              boxShadow: '0px 6px 12px rgba(0,0,0,0.15)',
+            },
+          }}
         >
-          {viewOptions.map((opt) => (
-            <ToggleButton key={opt.value} value={opt.value}>
+          Limpar filtros
+        </Button>
+      )}
+
+      <Divider
+        orientation="vertical"
+        flexItem
+        sx={{
+          mx: 1,
+          height: 60,       // altura da linha
+          width: 2,         // espessura da linha
+          bgcolor: 'grey.300' // cor (opcional)
+        }}
+      />
+
+      {/* 2) Período */}
+      {periodOptions && (
+        periodValue
+          ? <FilterTag label={periodValue} onDelete={onPeriodClear} />
+          : (
+            <FormControl size="small" sx={{ minWidth: 140, height: 32 }}>
+              <InputLabel sx={{marginTop: -0.5}}>Período</InputLabel>
+              <Select
+                label="Período"
+                value={periodValue}
+                onChange={onPeriodChange}
+                sx={{ height: 40, borderRadius: 2, marginTop: -0.5 }}
+              >
+                <MenuItem value=""><em>Todos</em></MenuItem>
+                {periodOptions.map(opt => (
+                  <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )
+      )}
+
+      {/* 3) Ano */}
+      {yearOptions && (
+        yearValue
+          ? <FilterTag label={yearValue} onDelete={onYearClear} />
+          : (
+            <FormControl size="small" sx={{ minWidth: 100, height: 32 }}>
+              <InputLabel sx={{marginTop: -0.5}}>Ano</InputLabel>
+              <Select
+                label="Ano"
+                value={yearValue}
+                onChange={onYearChange}
+                sx={{ height: 40, borderRadius: 2, marginTop: -0.5 }}
+              >
+                <MenuItem value=""><em>Todos</em></MenuItem>
+                {yearOptions.map(y => (
+                  <MenuItem key={y} value={y}>{y}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )
+      )}
+
+      <Divider
+        orientation="vertical"
+        flexItem
+        sx={{
+          mx: 1,
+          height: 60,       // altura da linha
+          width: 2,         // espessura da linha
+          bgcolor: 'grey.300' // cor (opcional)
+        }}
+      />
+
+      {/* 4) KPI */}
+      {kpiOptions && (
+        kpiValue
+          ? <FilterTag label={kpiValue} onDelete={onKpiClear} />
+          : (
+            <FormControl size="small" sx={{ minWidth: 120, height: 32 }}>
+              <InputLabel sx={{marginTop: -0.5}}>KPI</InputLabel>
+              <Select
+                label="KPI"
+                value={kpiValue}
+                onChange={onKpiChange}
+                sx={{ height: 40, borderRadius: 2, marginTop: -0.5 }}
+              >
+                <MenuItem value=""><em>Todos</em></MenuItem>
+                {kpiOptions.map(opt => (
+                  <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )
+      )}
+
+      <Divider
+        orientation="vertical"
+        flexItem
+        sx={{
+          mx: 1,
+          height: 60,       // altura da linha
+          width: 2,         // espessura da linha
+          bgcolor: 'grey.300' // cor (opcional)
+        }}
+      />
+
+      {/* 5) pills de visão */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {viewOptions.map(opt => {
+          const active = viewValue.includes(opt.value);
+          return (
+            <ToggleButton
+              key={opt.value}
+              value={opt.value}
+              selected={active}
+              onChange={() => {
+                if (active) {
+                  onViewChange(null, viewValue.filter(v => v !== opt.value));
+                } else {
+                  onViewChange(null, [...viewValue, opt.value]);
+                }
+              }}
+              sx={{
+                borderRadius: '10px',
+                textTransform: 'none',
+                bgcolor: active ? '#DEE0FF' : 'transparent',
+                boxShadow: active
+                  ? '0px 4px 8px rgba(0,0,0,0.1)'
+                  : 'none',
+                color: active ? '#0040FE' : 'text.secondary',
+                '&:hover': {
+                  bgcolor: active ? '#0040FE' : '#F5F5F5',
+                },
+              }}
+            >
               {opt.label}
             </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
-      </Grid>
+          );
+        })}
+      </Box>
 
-      {/* Divider vertical */}
-      <Grid item>
-        <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-      </Grid>
+      <Divider
+        orientation="vertical"
+        flexItem
+        sx={{
+          mx: 1,
+          height: 60,       // altura da linha
+          width: 2,         // espessura da linha
+          bgcolor: 'grey.300' // cor (opcional)
+        }}
+      />
 
-      {/* Cenários */}
-      <Grid item>
-        <FormControl size="small" sx={{ minWidth: 150,marginRight: 2 }}>
-          <InputLabel>Cenários</InputLabel>
-          <Select
-            value={scenarioValue}
-            label="Cenários"
-            onChange={onScenarioChange}
-          >
-            {scenarioOptions.map((opt) => (
-              <MenuItem key={opt} value={opt}>
-                {opt}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-    </Grid>
+      {/* 6) Cenários */}
+      {scenarioOptions && (
+        scenarioValue
+          ? <FilterTag label={scenarioValue} onDelete={onScenarioClear} />
+          : (
+            <FormControl size="small" sx={{ minWidth: 140, height: 32 }}>
+              <InputLabel sx={{marginTop: -0.5}}>Cenários</InputLabel>
+              <Select
+                label="Cenários"
+                value={scenarioValue}
+                onChange={onScenarioChange}
+                sx={{ height: 40, borderRadius: 2, marginTop: -0.5 }}
+              >
+                <MenuItem value=""><em>Todos</em></MenuItem>
+                {scenarioOptions.map(opt => (
+                  <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )
+      )}
+    </Box>
   );
 }
 
 FiltersBar.propTypes = {
-  periodOptions: PropTypes.arrayOf(
-    PropTypes.shape({ value: PropTypes.any, label: PropTypes.string })
-  ).isRequired,
-  periodValue: PropTypes.any,
-  onPeriodChange: PropTypes.func.isRequired,
+  periodOptions:    PropTypes.array,
+  periodValue:      PropTypes.any,
+  onPeriodChange:   PropTypes.func,
+  onPeriodClear:    PropTypes.func,
 
-  yearOptions: PropTypes.array.isRequired,
-  yearValue: PropTypes.any,
-  onYearChange: PropTypes.func.isRequired,
+  yearOptions:      PropTypes.array,
+  yearValue:        PropTypes.any,
+  onYearChange:     PropTypes.func,
+  onYearClear:      PropTypes.func,
 
-  kpiOptions: PropTypes.array.isRequired,
-  kpiValue: PropTypes.any,
-  onKpiChange: PropTypes.func.isRequired,
+  kpiOptions:       PropTypes.array,
+  kpiValue:         PropTypes.any,
+  onKpiChange:      PropTypes.func,
+  onKpiClear:       PropTypes.func,
 
-  viewOptions: PropTypes.arrayOf(
-    PropTypes.shape({ value: PropTypes.any, label: PropTypes.string })
-  ).isRequired,
-  viewValue: PropTypes.any,
-  onViewChange: PropTypes.func.isRequired,
+  scenarioOptions:  PropTypes.array,
+  scenarioValue:    PropTypes.any,
+  onScenarioChange: PropTypes.func,
+  onScenarioClear:  PropTypes.func,
 
-  scenarioOptions: PropTypes.array.isRequired,
-  scenarioValue: PropTypes.any,
-  onScenarioChange: PropTypes.func.isRequired,
+  viewOptions:      PropTypes.array.isRequired,
+  viewValue:        PropTypes.any.isRequired,
+  onViewChange:     PropTypes.func.isRequired,
+
+  onClearAll:       PropTypes.func.isRequired,
 };

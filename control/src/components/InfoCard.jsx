@@ -16,14 +16,15 @@ export default function InfoCard({ title, value, change, updatedAt }) {
   return (
     <Card
       sx={{
-        bgcolor: '#F3E8FF',
+        bgcolor: '#DEE0FF',
         borderRadius: 2,
         boxShadow: 'none',
+        width: 360
       }}
     >
       <CardHeader
         title={
-          <Typography variant="subtitle2" sx={{ fontWeight: 500 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 500, marginBottom:3 }}>
             {title}
           </Typography>
         }

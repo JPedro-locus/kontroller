@@ -40,7 +40,7 @@ export default function Header() {
           component="img"
           src={logoImg}
           alt="Kontrolle"
-          sx={{ height: 40, mr: 2 }}
+          sx={{ height: 70, mr: 2 }}
         />
 
         {/* Campo de busca */}

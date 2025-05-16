@@ -43,6 +43,18 @@ export default function DFC() {
     { label: 'Período 1', start: '', end: '' },
     { label: 'Período 2', start: '', end: '' },
   ]);
+
+  const handleAddPeriod = () => {
+    setPeriods(ps => [
+      ...ps,
+      {
+        label: `Período ${ps.length + 1}`,
+        start: '',
+        end: '',
+      }
+    ]);
+  };
+
   const handlePeriodConfirm = idx => ({ start, end }) => {
     setPeriods(p => {
       const c = [...p];
@@ -128,6 +140,7 @@ export default function DFC() {
             ))}
             <Grid item xs={12} md={4}>
               <Paper
+                onClick={handleAddPeriod}              // ← aqui
                 sx={{
                   p: 2,
                   borderRadius: 2,
@@ -137,6 +150,8 @@ export default function DFC() {
                   justifyContent: 'center',
                   minHeight: 160,
                   minWidth: 280,
+                  cursor: 'pointer',                   // deixa parecer clicável
+                  '&:hover': { backgroundColor: '#f5f5f5' }
                 }}
               >
                 + Adicionar período

@@ -1,103 +1,96 @@
 // src/pages/KPIs.jsx
 import React, { useState } from 'react';
-import {
-  Box,
-  Container,
-  Grid,
-  TextField,
-  Typography,
-  Paper,
-} from '@mui/material';
+import { Box, Container, Grid, Typography, Paper } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+
 import Sidebar from '../components/Sidebar/Sidebar';
 import TitleBar from '../components/Subtitle';
 import FiltersBar from '../components/FiltersBar';
 import PeriodPicker from '../components/PeriodPicker';
 import DataTable from '../components/DataTable';
-import { useNavigate } from 'react-router-dom';
 
 export default function KPIs() {
   const navigate = useNavigate();
-  // filtros de topo
+
+  // ─── filtros de topo ───────────────────────────────────────────
   const [historia, setHistoria]     = useState('Histórico');
-  const [period, setPeriod]         = useState('');
-  const [year, setYear]             = useState('');
-  const [kpi, setKpi]               = useState('');
-  const [view, setView]             = useState('realOrcado');
-  const [scenario, setScenario]     = useState('');
-  const [baseBudget, setBaseBudget] = useState('');
+  const [period,    setPeriod]      = useState('');
+  const [year,      setYear]        = useState('');
+  const [kpi,       setKpi]         = useState('');
+  const [view,      setView]        = useState('realOrcado');
+  const [scenario,  setScenario]    = useState('');
+  const [baseBudget,setBaseBudget]  = useState('');
 
-  // indicadores principais
+  // ─── indicadores ────────────────────────────────────────────────
   const metricNames = [
-    'MRR',
-    'ARR',
-    'Churn Rate',
-    'CAC',
-    'LTV',
-    'Net Revenue',
-    'Gross Margin',
-    'Active Users',
-    'New Customers',
-    'Support Tickets',
+    'MRR','ARR','Churn Rate','CAC','LTV',
+    'Net Revenue','Gross Margin','Active Users',
+    'New Customers','Support Tickets',
   ];
 
-  // meses completos (para tabela principal)
-  const months = [
-    'Jan-22','Fev-22','Mar-22','Abr-22',
-    'Mai-22','Jun-22','Jul-22','Ago-22',
-    'Set-22','Out-22','Nov-22','Dez-22',
-  ];
-  // alterna Real/Forecast para cada mês
-  const viewLabels = months.map((_, i) =>
-    i % 2 === 0 ? 'Real' : 'Forecast'
-  );
-  // gera linhas para a tabela principal
-  const rows = metricNames.map((label, ri) => ({
+  // meses / viewLabels / linhas da tabela principal
+  const months     = ['Jan-22','Fev-22','Mar-22','Abr-22','Mai-22','Jun-22','Jul-22','Ago-22','Set-22','Out-22','Nov-22','Dez-22'];
+  const viewLabels = months.map((_,i) => i % 2 === 0 ? 'Real' : 'Forecast');
+  const rows       = metricNames.map((label,ri) => ({
     label,
     unit: "R$'000'",
-    values: months.map((_, mi) => (ri + 1) * 1000 + mi * 120),
+    values: months.map((_,mi) => (ri+1)*1000 + mi*120),
   }));
 
-  // comparar períodos
+  // ─── comparação de períodos ──────────────────────────────────────
   const [periods, setPeriods] = useState([
     { label: 'Período 1', start: '', end: '' },
     { label: 'Período 2', start: '', end: '' },
   ]);
+
+  const handleAddPeriod = () => {
+    setPeriods(ps => [
+      ...ps,
+      {
+        label: `Período ${ps.length + 1}`,
+        start: '',
+        end: '',
+      }
+    ]);
+  };
+
   const handlePeriodConfirm = idx => ({ start, end }) => {
-    setPeriods(prev => {
-      const copy = [...prev];
+    setPeriods(p => {
+      const copy = [...p];
       copy[idx] = { ...copy[idx], start, end };
       return copy;
     });
   };
   const handlePeriodCancel = idx => {
-    setPeriods(prev => {
-      const copy = [...prev];
+    setPeriods(p => {
+      const copy = [...p];
       copy[idx] = { ...copy[idx], start: '', end: '' };
       return copy;
     });
   };
 
-  // configura tabela de comparação só de Jan-Mar
-  const compMonths = ['Jan-22','Jan-22','Fev-22','Fev-22','Mar-22','Mar-22'];
-  const compViewLabels = compMonths.map((_, i) =>
-    i % 2 === 0 ? 'Real' : 'Forecast'
-  );
-  const compRows = metricNames.map((label, ri) => ({
+  // ─── tabela de comparação Jan–Mar ────────────────────────────────
+  const compMonths     = ['Jan-22','Jan-22','Fev-22','Fev-22','Mar-22','Mar-22'];
+  const compViewLabels = compMonths.map((_,i) => i%2===0 ? 'Real' : 'Forecast');
+  const compRows       = metricNames.map((label,ri) => ({
     label,
     unit: "R$'000'",
-    values: compMonths.map((m, mi) => {
-      const base = (ri + 1) * 1000 + months.indexOf(m) * 120;
-      return mi % 2 === 0
-        ? base
-        : Math.round(base * 1.1); // exemplo Forecast = +10%
+    values: compMonths.map((m,mi) => {
+      const base = (ri+1)*1000 + months.indexOf(m)*120;
+      return mi%2===0 ? base : Math.round(base*1.1);
     }),
   }));
 
+  // ─── limpa todos filtros ─────────────────────────────────────────
+  const clearAll = () => {
+    setPeriod(''); setYear(''); setKpi(''); setScenario('');
+  };
+
   return (
-    <Box sx={{ display: 'flex', height: '100%', width: '100%' }}>
+    <Box sx={{ display:'flex', height:'100%', width:'100%' }}>
       <Sidebar selectedItem="KPIs" onSelect={() => {}} />
 
-      <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+      <Box sx={{ flexGrow:1, overflow:'auto' }}>
         <Container maxWidth={false} disableGutters>
 
           {/* cabeçalho */}
@@ -105,74 +98,85 @@ export default function KPIs() {
             title="KPIs"
             showHistoryToggle
             historyValue={historia}
-            onHistoryChange={(_, v) => v && setHistoria(v)}
+            onHistoryChange={(_,v)=>v&&setHistoria(v)}
+
             showSelect
             selectLabel="Orçamento base"
             selectOptions={[
-              { value: 'jan', label: 'Jan' },
-              { value: 'fev', label: 'Fev' },
-              { value: 'mar', label: 'Mar' },
+              { value:'jan', label:'Jan' },
+              { value:'fev', label:'Fev' },
+              { value:'mar', label:'Mar' },
             ]}
             selectValue={baseBudget}
-            onSelectChange={e => setBaseBudget(e.target.value)}
+            onSelectChange={e=>setBaseBudget(e.target.value)}
+
             showCreateButton
             createButtonText="Criar KPI"
-            onCreate={() => navigate('/kpis/novo')} 
+            onCreate={()=>navigate('/kpis/novo')}
+
             showDownloadButton
             downloadButtonText="Download"
-            onDownload={() => {}}
+            onDownload={()=>{}}
           />
+
           {/* filtros */}
           <Box mb={4}>
             <FiltersBar
               periodOptions={[
-                { value: 'ultimos30', label: 'Últimos 30 dias' },
-                { value: 'mesAtual',  label: 'Mês atual' },
+                {value:'ultimos30', label:'Últimos 30 dias'},
+                {value:'mesAtual',  label:'Mês atual'},
               ]}
               periodValue={period}
-              onPeriodChange={e => setPeriod(e.target.value)}
-              yearOptions={[2025, 2024, 2023, 2022]}
+              onPeriodChange={e=>setPeriod(e.target.value)}
+              onPeriodClear={()=>setPeriod('')}
+
+              yearOptions={[2025,2024,2023,2022]}
               yearValue={year}
-              onYearChange={e => setYear(e.target.value)}
+              onYearChange={e=>setYear(e.target.value)}
+              onYearClear={()=>setYear('')}
+
               kpiOptions={metricNames}
               kpiValue={kpi}
-              onKpiChange={e => setKpi(e.target.value)}
+              onKpiChange={e=>setKpi(e.target.value)}
+              onKpiClear={()=>setKpi('')}
+
+              scenarioOptions={['Base','Otimista','Pessimista']}
+              scenarioValue={scenario}
+              onScenarioChange={e=>setScenario(e.target.value)}
+              onScenarioClear={()=>setScenario('')}
+
               viewOptions={[
-                { value: 'realOrcado', label: 'Real X Orçado' },
-                { value: 'forecast',    label: 'Forecast' },
-                { value: 'favoritos',   label: 'Favoritos' },
+                {value:'realOrcado', label:'Real X Orçado'},
+                {value:'forecast',    label:'Forecast'},
+                {value:'favoritos',   label:'Favoritos'},
               ]}
               viewValue={view}
-              onViewChange={(_, v) => v && setView(v)}
-              scenarioOptions={['Base', 'Otimista', 'Pessimista']}
-              scenarioValue={scenario}
-              onScenarioChange={e => setScenario(e.target.value)}
+              onViewChange={(_,v)=>v&&setView(v)}
+
+              onClearAll={clearAll}
             />
           </Box>
 
           {/* tabela principal */}
-          <DataTable
-            rows={rows}
-            months={months}
-            viewLabels={viewLabels}
-          />
+          <DataTable rows={rows} months={months} viewLabels={viewLabels} />
 
           {/* comparar períodos */}
           <Typography variant="h6" gutterBottom>
             Comparar períodos
           </Typography>
           <Grid container spacing={2} mb={4}>
-            {periods.map((p, i) => (
+            {periods.map((p,i)=>(
               <Grid item xs={12} md={4} key={p.label}>
                 <PeriodPicker
                   label={p.label}
                   onConfirm={handlePeriodConfirm(i)}
-                  onCancel={() => handlePeriodCancel(i)}
+                  onCancel={()=>handlePeriodCancel(i)}
                 />
               </Grid>
             ))}
             <Grid item xs={12} md={4}>
               <Paper
+                onClick={handleAddPeriod}              // ← aqui
                 sx={{
                   p: 2,
                   borderRadius: 2,
@@ -182,6 +186,8 @@ export default function KPIs() {
                   justifyContent: 'center',
                   minHeight: 160,
                   minWidth: 280,
+                  cursor: 'pointer',                   // deixa parecer clicável
+                  '&:hover': { backgroundColor: '#f5f5f5' }
                 }}
               >
                 + Adicionar período
@@ -189,7 +195,7 @@ export default function KPIs() {
             </Grid>
           </Grid>
 
-          {/* tabela de comparação Jan-22 a Mar-22 */}
+          {/* tabela de comparação Jan–Mar */}
           <Typography variant="h6" gutterBottom>
             Comparação Jan-22 a Mar-22
           </Typography>
@@ -198,6 +204,7 @@ export default function KPIs() {
             months={compMonths}
             viewLabels={compViewLabels}
           />
+
         </Container>
       </Box>
     </Box>

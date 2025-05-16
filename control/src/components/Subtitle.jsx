@@ -1,3 +1,4 @@
+// src/components/TitleBar.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -45,7 +46,7 @@ export default function TitleBar({
       justifyContent="space-between"
       alignItems="center"
       mb={3}
-      sx={{marginTop:3}}
+      sx={{ mt: 3 }}
     >
       {/* título + toggle histórico */}
       <Box display="flex" alignItems="center">
@@ -56,25 +57,72 @@ export default function TitleBar({
         {showHistoryToggle && (
           <ToggleButtonGroup
             size="small"
-            value={historyValue}
             exclusive
+            value={historyValue}
             onChange={onHistoryChange}
+            sx={{
+              // contorno arredondado ao redor do grupo
+              border: '1px solid #C4C4D1',
+              borderRadius: '20px',
+              // remove espaçamento padrão entre botões
+              '& .MuiToggleButton-root': {
+                border: 'none',
+                borderRadius: '20px',
+                padding: '4px 16px',
+                color: '#4B4B60',
+              },
+              // cor quando ativo
+              '& .Mui-selected': {
+                backgroundColor: '#F2F0FB',
+                color: '#4B4B60',
+              },
+              // ajuste de tamanho
+              minHeight: '32px',
+            }}
           >
             <ToggleButton value="Histórico">Histórico</ToggleButton>
-            {/* adicione outros toggles se precisar */}
           </ToggleButtonGroup>
         )}
       </Box>
 
       {/* controles à direita */}
-      <Box display="flex" alignItems="center">
+      <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
         {showSelect && (
-          <FormControl size="small" sx={{ minWidth: 160, mr: 1, color: '#0040FE', borderRadius: 10 }}>
-            <InputLabel>{selectLabel}</InputLabel>
+          <FormControl size="small">
+            <InputLabel
+              sx={{ color: '#0040FE', ml: 1 }}
+              id="titlebar-select-label"
+            >
+              {selectLabel}
+            </InputLabel>
             <Select
-              label={selectLabel}
+              labelId="titlebar-select-label"
               value={selectValue}
               onChange={onSelectChange}
+              label={selectLabel}
+              variant="outlined"
+              displayEmpty
+              sx={{
+                color: '#0040FE',
+                borderRadius: '20px',
+                minWidth: 180,
+                height: 40,
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#0040FE',
+                  borderWidth: 2,
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#0040FE',
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#0040FE',
+                },
+                '& .MuiSelect-icon': {
+                  color: '#0040FE',
+                },
+                pl: 1.5,
+                pr: 1.5,
+              }}
             >
               {selectOptions.map((opt) => (
                 <MenuItem key={opt.value} value={opt.value}>
@@ -89,8 +137,13 @@ export default function TitleBar({
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
-            sx={{ mr: 1, backgroundColor: '#DEE0FF', borderRadius: 20 }}
             onClick={onCreate}
+            sx={{
+              backgroundColor: '#DEE0FF',
+              borderRadius: '20px',
+              textTransform: 'none',
+              height: 40,
+            }}
           >
             {createButtonText}
           </Button>
@@ -101,7 +154,12 @@ export default function TitleBar({
             variant="contained"
             startIcon={<DownloadIcon />}
             onClick={onDownload}
-            sx={{ backgroundColor: '#0040FE', borderRadius: 20 }}
+            sx={{
+              backgroundColor: '#0040FE',
+              borderRadius: '20px',
+              textTransform: 'none',
+              height: 40,
+            }}
           >
             {downloadButtonText}
           </Button>
