@@ -1,5 +1,5 @@
 // src/pages/KPIs.jsx
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Box, Container, Grid, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,6 +8,7 @@ import TitleBar from '../components/Subtitle';
 import FiltersBar from '../components/FiltersBar';
 import PeriodPicker from '../components/PeriodPicker';
 import DataTable from '../components/DataTable';
+import ComparisonTable from '../components/ComparasionTable';
 
 export default function KPIs() {
   const navigate = useNavigate();
@@ -69,17 +70,43 @@ export default function KPIs() {
     });
   };
 
-  // ─── tabela de comparação Jan–Mar ────────────────────────────────
+  // ─── comparação de períodos ────────────────────────────────────────
   const compMonths     = ['Jan-22','Jan-22','Fev-22','Fev-22','Mar-22','Mar-22'];
-  const compViewLabels = compMonths.map((_,i) => i%2===0 ? 'Real' : 'Forecast');
-  const compRows       = metricNames.map((label,ri) => ({
+  const compViewLabels = compMonths.map((_,i) => i % 2 === 0 ? 'Real' : 'Forecast');
+  const compRowsRaw    = metricNames.map((label,ri) => ({
     label,
     unit: "R$'000'",
-    values: compMonths.map((m,mi) => {
+    // valores flat [real1,fcst1, real2,fcst2, real3,fcst3]
+    valuesFlat: compMonths.map((m,mi) => {
       const base = (ri+1)*1000 + months.indexOf(m)*120;
-      return mi%2===0 ? base : Math.round(base*1.1);
+      return mi % 2 === 0 ? base : Math.round(base * 1.1);
     }),
   }));
+
+  // 2) derivo um array de períodos de 2 em 2 meses
+  const monthsByPeriod = useMemo(() => {
+    const periods = [];
+    for (let i = 0; i < compMonths.length; i += 2) {
+      periods.push([compMonths[i], compMonths[i+1]]);
+    }
+    return periods;
+  }, [compMonths]);
+
+  // 3) reformato cada linha para o shape expected pelo ComparisonTable:
+  //    values: [ [real1,fcst1], [real2,fcst2], [real3,fcst3] ]
+  const compRows = useMemo(() => {
+    return compRowsRaw.map(r => {
+      const vals = [];
+      for (let i = 0; i < r.valuesFlat.length; i += 2) {
+        vals.push([ r.valuesFlat[i], r.valuesFlat[i+1] ]);
+      }
+      return {
+        label: r.label,
+        unit:  r.unit,
+        values: vals,
+      };
+    });
+  }, [compRowsRaw]);
 
   // ─── limpa todos filtros ─────────────────────────────────────────
   const clearAll = () => {
@@ -199,11 +226,10 @@ export default function KPIs() {
           <Typography variant="h6" gutterBottom>
             Comparação Jan-22 a Mar-22
           </Typography>
-          <DataTable
-            rows={compRows}
-            months={compMonths}
-            viewLabels={compViewLabels}
-          />
+          <ComparisonTable
+             rows={compRows}
+             monthsByPeriod={monthsByPeriod}
+           />
 
         </Container>
       </Box>

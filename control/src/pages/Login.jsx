@@ -1,4 +1,3 @@
-// src/pages/LoginPage.jsx
 import React, { useState } from 'react';
 import {
   Grid,
@@ -24,10 +23,19 @@ const Login = ({ onLogin, onSignUp }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const validEmail = 'joao.ribeiro@locus.ne';
+  const validPassword = '12345Aa@';
 
   const handleAction = () => {
     if (tab === 'login') {
-      onLogin();
+      if (email === validEmail && password === validPassword) {
+        setError('');
+        onLogin();
+      } else {
+        setError('Credenciais inválidas');
+      }
     } else {
       onSignUp();
     }
@@ -46,7 +54,7 @@ const Login = ({ onLogin, onSignUp }) => {
           alignItems: 'center',
           justifyContent: 'center',
           p: 2,
-          width: "55%"
+          width: '55%'
         }}
       >
         <Box
@@ -94,7 +102,7 @@ const Login = ({ onLogin, onSignUp }) => {
             }}
           >
             <Button
-              onClick={() => setTab('login')}
+              onClick={() => { setTab('login'); setError(''); }}
               variant={tab === 'login' ? 'contained' : 'text'}
               startIcon={<ArrowForwardIosIcon />}
               sx={{ borderRadius: '999px', textTransform: 'none', px: 3 }}
@@ -102,7 +110,7 @@ const Login = ({ onLogin, onSignUp }) => {
               Login
             </Button>
             <Button
-              onClick={() => setTab('signup')}
+              onClick={() => { setTab('signup'); setError(''); }}
               variant={tab === 'signup' ? 'contained' : 'text'}
               startIcon={<EditIcon />}
               sx={{ borderRadius: '999px', textTransform: 'none', px: 3 }}
@@ -176,6 +184,13 @@ const Login = ({ onLogin, onSignUp }) => {
           >
             {tab === 'login' ? 'Login' : 'Cadastrar'}
           </Button>
+
+          {/* mensagem de erro */}
+          {error && (
+            <Typography variant="body2" color="error" align="center" sx={{ mt: 2 }}>
+              {error}
+            </Typography>
+          )}
 
           {/* rodapé */}
           <Typography
